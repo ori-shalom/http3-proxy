@@ -8,7 +8,7 @@ on:
 env:
   prod_branch: refs/heads/main
   dev_branch: refs/heads/develop
-  version: 2
+  version: 8
 
 jobs:
   build-dockers:
