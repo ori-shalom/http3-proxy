@@ -1,8 +1,7 @@
-package http3proxy
+package proxy
 
 import (
 	"github.com/lucas-clemente/quic-go/http3"
-	"github.com/ori-shalom/http3-proxy/config"
 	"io"
 	"log"
 	"net/http"
@@ -10,7 +9,7 @@ import (
 
 var http3Client = http.Client{Transport: &http3.RoundTripper{}}
 
-func NewHttp3Proxy(conf config.Config) error {
+func NewHttp3Proxy(conf Config) error {
 	handler := proxyHandler(conf.TargetHost)
 
 	return http.ListenAndServe(":"+conf.Port, handler)
@@ -25,6 +24,9 @@ func proxyHandler(targetHost string) http.HandlerFunc {
 			log.Println(err)
 			return
 		}
+		// ignore error (nothing to do if connection to server close)
+		defer func() { _ = response.Body.Close() }()
+
 		writeResponse(w, response)
 	}
 }
@@ -35,12 +37,11 @@ func prepareProxyRequest(r *http.Request, targetHost string) *http.Request {
 	request.URL.Host = targetHost
 	request.Host = targetHost
 	request.RequestURI = ""
+	request.Proto = ""
 	return request
 }
 
 func writeResponse(w http.ResponseWriter, response *http.Response) {
-	// ignore error (nothing to do if connection to server close)
-	defer func() { _ = response.Body.Close() }()
 
 	// copy response headers
 	for header, values := range response.Header {

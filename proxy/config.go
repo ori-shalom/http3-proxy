@@ -1,4 +1,4 @@
-package config
+package proxy
 
 import (
 	"fmt"
@@ -9,6 +9,11 @@ const (
 	portVarName       = "PORT"
 	targetHostVarName = "TARGET_HOST"
 )
+
+var variables = map[string]envVarOptions{
+	targetHostVarName: {required: true},
+	portVarName:       {defaultValue: "8080"},
+}
 
 type Config struct {
 	Port       string
@@ -21,10 +26,7 @@ type envVarOptions struct {
 }
 
 func LoadConfig() (Config, error) {
-	vars, err := loadEnvironmentVariables(map[string]envVarOptions{
-		targetHostVarName: {required: true},
-		portVarName:       {defaultValue: "8080"},
-	})
+	vars, err := loadEnvironmentVariables(variables)
 	if err != nil {
 		return Config{}, err
 	}

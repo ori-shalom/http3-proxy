@@ -1,8 +1,7 @@
 package main
 
 import (
-	"github.com/ori-shalom/http3-proxy/config"
-	"github.com/ori-shalom/http3-proxy/http3proxy"
+	"github.com/ori-shalom/http3-proxy/proxy"
 	"log"
 )
 
@@ -13,10 +12,10 @@ func main() {
 }
 
 func handleMain() error {
-	conf, err := config.LoadConfig()
+	conf, err := proxy.LoadConfig()
 	if err != nil {
 		return err
 	}
 
-	return http3proxy.NewHttp3Proxy(conf)
+	return proxy.NewHttp3Proxy(conf)
 }
